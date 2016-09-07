@@ -1,4 +1,4 @@
 #set the base image
-FROM apache-php 
+FROM wordpress 
 #file author
 MAINTAINER virgil
