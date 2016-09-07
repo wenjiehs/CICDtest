@@ -1,4 +1,4 @@
 #set the base image
-FROM nginx
+FROM apache-php 
 #file author
 MAINTAINER virgil
