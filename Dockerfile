@@ -1,55 +1,25 @@
-############################################################
-
-# Dockerfile to build Nginx Installed Containers
-
-# Based on Ubuntu
-
-############################################################
-
-# Set the base image to Ubuntu
-
-FROM ubuntu
-
-# File Author / Maintainer
-
-MAINTAINER Maintaner Name
-
-# Install Nginx
-
-# Add application repository URL to the default sources
-
-RUN echo "deb http://archive.ubuntu.com/ubuntu/ raring main universe" >> /etc/apt/sources.list
-
-# Update the repository
-
-RUN apt-get update
-
-# Install necessary tools
-
-RUN apt-get install -y nano wget dialog net-tools
-
-# Download and Install Nginx
-
-RUN apt-get install -y nginx
-
-# Remove the default Nginx configuration file
-
-RUN rm -v /etc/nginx/nginx.conf
-
-# Copy a configuration file from the current directory
-
-ADD nginx.conf /etc/nginx/
-
-# Append "daemon off;" to the beginning of the configuration
-
-RUN echo "daemon off;" >> /etc/nginx/nginx.conf
-
-# Expose ports
-
+#新生成的镜像是基于sshd:dockerfile镜像
+FROM sshd:dockerfile
+MAINTAINER by Steven
+#安装wget
+RUN yum install -y wget
+WORKDIR /usr/local/src
+#下载并解压源码包
+RUN wget http://apache.fayea.com/httpd/httpd-2.4.17.tar.gz
+RUN tar -zxvf httpd-2.4.17.tar.gz
+WORKDIR httpd-2.4.17
+#编译安装apache
+RUN yum install -y gcc make apr-devel apr apr-util apr-util-devel pcre-devel
+RUN ./configure --prefix=/usr/local/apache2  --enable-mods-shared=most  --enable-so
+RUN make
+RUN make install
+#修改apache配置文件
+RUN sed -i 's/#ServerName www.example.com:80/ServerName localhost:80/g' /usr/local/apache2/conf/httpd.conf
+#启动apache服务
+RUN /usr/local/apache2/bin/httpd
+#复制服务启动脚本并设置权限
+ADD run.sh /usr/local/sbin/run.sh
+RUN chmod 755 /usr/local/sbin/run.sh
+#开放80端口
 EXPOSE 80
-
-# Set the default command to execute
-
-# when creating a new container
-
-CMD service nginx start
+CMD ["/usr/local/sbin/run.sh"]
