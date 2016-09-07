@@ -1,4 +1,4 @@
 #set the base image
-FROM wordpress 
+FROM nginx
 #file author
 MAINTAINER virgil
